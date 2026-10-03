@@ -1,0 +1,63 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.pyi
+
+# Debugger / IDEs
+.vscode/
+.idea/
+.qodo/
+.zenflow/
+.zencoder/
+
+# Environment
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Databases
+*.db
+*.sqlite3
+
+# Models and large binaries (exclude heavy binaries)
+Models/*/weights/
+Media/*.mp4
+web_app/static/uploads/
+*.pt
+*.obj
+!object/poligon.obj
+!web_app/object/poligon.obj
+
+# OS
+.DS_Store
+Thumbs.db
+

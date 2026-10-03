@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Parking System | AI-Powered Occupancy Monitoring</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"/>
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+      
+      :root {
+        --primary-blue: #0d6efd;
+        --dark-blue: #0a58ca;
+        --light-bg: #f8f9fa;
+        --text-main: #212529;
+        --text-muted: #6c757d;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #ffffff;
+        min-height: 100vh;
+        font-family: 'Inter', sans-serif;
+        color: var(--text-main);
+        overflow-x: hidden;
+      }
+
+      /* Navigation */
+      .navbar {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 1rem 0;
+      }
+      .navbar-brand {
+        font-weight: 800;
+        color: var(--primary-blue) !important;
+        letter-spacing: -0.5px;
+      }
+      .navbar-brand span { color: var(--text-main); }
+      .nav-link {
+        color: var(--text-main) !important;
+        font-weight: 500;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+      }
+      .nav-link:hover { color: var(--primary-blue) !important; }
+      .btn-login {
+        background: var(--primary-blue);
+        color: #ffffff !important;
+        border-radius: 8px;
+        padding: 10px 24px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s;
+      }
+      .btn-login:hover {
+        background: var(--dark-blue);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
+      }
+
+      /* Hero Section */
+      .hero {
+        padding: 120px 0 80px;
+        background: linear-gradient(180deg, #f0f7ff 0%, #ffffff 100%);
+        text-align: center;
+      }
+      .hero-tag {
+        display: inline-block;
+        padding: 8px 16px;
+        background: rgba(13, 110, 253, 0.1);
+        color: var(--primary-blue);
+        font-weight: 700;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        margin-bottom: 24px;
+        border-radius: 50px;
+      }
+      .hero h1 {
+        font-size: 4rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin-bottom: 24px;
+        letter-spacing: -1.5px;
+        line-height: 1.1;
+      }
+      .hero h1 span {
+        color: var(--primary-blue);
+      }
+      .hero p {
+        font-size: 1.25rem;
+        color: var(--text-muted);
+        max-width: 650px;
+        margin: 0 auto 40px;
+        line-height: 1.6;
+      }
+      .hero-btns {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+      }
+      .btn-primary-custom {
+        background: var(--primary-blue);
+        color: #fff;
+        font-weight: 600;
+        padding: 16px 32px;
+        border-radius: 12px;
+        transition: all 0.3s;
+        border: none;
+        text-decoration: none;
+      }
+      .btn-primary-custom:hover {
+        background: var(--dark-blue);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(13, 110, 253, 0.2);
+      }
+      .btn-outline-custom {
+        background: #fff;
+        color: var(--text-main);
+        border: 1px solid #dee2e6;
+        font-weight: 600;
+        padding: 16px 32px;
+        border-radius: 12px;
+        transition: all 0.3s;
+        text-decoration: none;
+      }
+      .btn-outline-custom:hover {
+        background: #f8f9fa;
+        border-color: #ced4da;
+      }
+
+      /* Feature Cards */
+      .tech-card {
+        background: #ffffff;
+        border: 1px solid #f1f3f5;
+        padding: 40px;
+        border-radius: 20px;
+        transition: all 0.3s;
+        height: 100%;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+      }
+      .tech-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+        border-color: var(--primary-blue);
+      }
+      .tech-card i {
+        font-size: 2.5rem;
+        color: var(--primary-blue);
+        margin-bottom: 24px;
+        display: block;
+      }
+      .tech-card h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 16px;
+      }
+      .tech-card p {
+        color: var(--text-muted);
+        line-height: 1.6;
+        font-size: 0.95rem;
+        margin-bottom: 0;
+      }
+
+      /* About Section */
+      .section {
+        padding: 100px 0;
+      }
+      .about-image img {
+        width: 100%;
+        border-radius: 24px;
+        box-shadow: 0 30px 60px rgba(0,0,0,0.1);
+      }
+      .section-heading span {
+        color: var(--primary-blue);
+      }
+
+      /* Footer */
+      footer {
+        background: #f8f9fa;
+        padding: 80px 0 40px;
+        border-top: 1px solid #eee;
+      }
+      .footer-logo {
+        font-weight: 800;
+        font-size: 1.5rem;
+        color: var(--primary-blue);
+        margin-bottom: 20px;
+        display: block;
+      }
+      .footer-links a {
+        display: block;
+        color: var(--text-muted);
+        text-decoration: none;
+        margin-bottom: 12px;
+        transition: color 0.3s;
+      }
+      .footer-links a:hover {
+        color: var(--primary-blue);
+      }
+      .footer-bottom {
+        text-align: center;
+        margin-top: 60px;
+        padding-top: 30px;
+        border-top: 1px solid #e9ecef;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 768px) {
+        .hero h1 { font-size: 2.5rem; }
+        .hero-btns { flex-direction: column; }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+      <div class="container">
+        <a class="navbar-brand" href="/">
+          SMART<span>PARKING</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto align-items-center">
+            <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+            <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+            <li class="nav-item ms-lg-4">
+              <a href="/login" class="btn btn-login">System Login</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+      <div class="container">
+        <h1>Smart Parking <span>System</span></h1>
+        <p>
+          An advanced computer vision-powered solution that automatically detects and monitors parking space availability in real-time using deep learning.
+        </p>
+        <div class="hero-btns">
+          <a href="/login" class="btn btn-primary-custom">Launch System</a>
+          <a href="#features" class="btn btn-outline-custom">Explore Features</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section" id="features">
+      <div class="container">
+        <h2 class="section-heading text-center mb-2" style="font-weight: 800; font-size: 2.5rem;">
+          Key <span>Features</span>
+        </h2>
+        <p class="text-center text-muted mb-5">Our parking detection system comes with powerful features for efficient parking management</p>
+        
+        <div class="row g-4 justify-content-center">
+          <div class="col-md-4">
+            <div class="tech-card">
+              <i class="fas fa-video"></i>
+              <h3>Real-time Video Processing</h3>
+              <p>Process video feeds from surveillance cameras to detect parking spaces in real-time with high accuracy.</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="tech-card">
+              <i class="fas fa-microchip"></i>
+              <h3>AI-Powered Detection</h3>
+              <p>Utilizes state-of-the-art YOLOv8 deep learning model for accurate vehicle detection and classification.</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="tech-card">
+              <i class="fas fa-draw-polygon"></i>
+              <h3>Custom Parking Zones</h3>
+              <p>Draw custom polygon zones on the video to define specific parking spaces according to your layout.</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="tech-card">
+              <i class="fas fa-chart-line"></i>
+              <h3>Live Statistics</h3>
+              <p>View real-time statistics about available and occupied parking spaces on an dashboard.</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="tech-card">
+              <i class="fas fa-cloud-upload-alt"></i>
+              <h3>Video Upload</h3>
+              <p>Easily upload parking lot videos for processing and analysis. Supports multiple video formats.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="section" id="about" style="background: #f8f9fa;">
+      <div class="container">
+        <div class="row align-items-center g-5">
+          <div class="col-lg-6">
+            <div class="about-image">
+              <img src="https://images.unsplash.com/photo-1590674899484-d5640e854abe?w=800&q=80" alt="Parking Lot">
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <h2 class="section-heading mb-4" style="font-weight: 800; font-size: 2.5rem;">
+              Project <span>Overview</span>
+            </h2>
+            <p class="mb-4" style="font-size: 1.1rem; color: var(--text-muted); line-height: 1.8;">
+              Smart Parking Space Detection is a cutting-edge computer vision application designed to automate the process of monitoring parking lot occupancy. 
+            </p>
+            <p class="mb-5" style="color: var(--text-muted); line-height: 1.7;">
+              By leveraging advanced deep learning algorithms and the YOLO (You Only Look Once) model, our system identifies vehicles in real-time and analyzes predefined parking zones to provide instant updates on space availability.
+            </p>
+            <div class="row g-4">
+              <div class="col-12">
+                <div class="p-3 border-start border-primary border-4 bg-white rounded shadow-sm">
+                  <h4 class="mb-1" style="font-weight: 700;">Live</h4>
+                  <p class="text-muted small mb-0">SYSTEM STATUS</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <div class="row g-5">
+          <div class="col-lg-6">
+            <span class="footer-logo">SMART PARKING</span>
+            <p style="color: var(--text-muted); max-width: 400px;">
+              Leading the way in intelligent urban infrastructure with AI-driven parking management solutions.
+            </p>
+          </div>
+          <div class="col-lg-3">
+            <h5 class="mb-4" style="font-weight: 700;">Directory</h5>
+            <div class="footer-links">
+              <a href="#home">Home</a>
+              <a href="#features">Features</a>
+              <a href="#about">About Us</a>
+            </div>
+          </div>
+          <div class="col-lg-3">
+            <h5 class="mb-4" style="font-weight: 700;">Access</h5>
+            <div class="footer-links">
+              <a href="/login" class="text-primary fw-bold">Login Portal</a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          &copy; 2026 Smart Parking System. All rights reserved.
+        </div>
+      </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

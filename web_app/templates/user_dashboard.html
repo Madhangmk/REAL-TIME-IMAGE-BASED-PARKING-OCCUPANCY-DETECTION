@@ -1,0 +1,967 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SmartPark — User Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  /* ── Home-page palette ── */
+  :root {
+    --primary:#0d6efd; --dark-blue:#0a58ca;
+    --success:#198754; --danger:#dc3545; --warning:#fd7e14;
+    --bg:#f0f7ff; --surface:#ffffff; --surface2:#f8f9fa;
+    --border:#e9ecef; --text:#212529; --muted:#6c757d;
+    --primary-light:#e8f0fe; --success-light:#d1e7dd;
+    --danger-light:#f8d7da; --warning-light:#fff3cd;
+    --radius:16px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;}
+
+  /* Sidebar */
+  .sidebar{width:240px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);
+    display:flex;flex-direction:column;padding:24px 16px;position:fixed;top:0;left:0;z-index:100;
+    box-shadow:2px 0 8px rgba(0,0,0,0.04);}
+  .brand{display:flex;align-items:center;gap:10px;padding:0 8px 24px;
+    border-bottom:1px solid var(--border);margin-bottom:20px;}
+  .brand-icon{width:38px;height:38px;background:var(--primary);border-radius:10px;
+    display:flex;align-items:center;justify-content:center;font-size:1rem;color:#fff;}
+  .brand-name{font-size:1.1rem;font-weight:800;letter-spacing:-0.3px;color:var(--primary);}
+  .brand-name span{color:var(--text);}
+  .nav-section{font-size:0.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;
+    letter-spacing:1px;padding:0 8px;margin:16px 0 8px;}
+  .nav-item{list-style:none;}
+  .nav-link{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
+    color:var(--muted);text-decoration:none;font-size:0.875rem;font-weight:500;
+    transition:all 0.2s;cursor:pointer;border:none;background:none;width:100%;}
+  .nav-link:hover{background:var(--primary-light);color:var(--primary);}
+  .nav-link.active{background:var(--primary-light);color:var(--primary);font-weight:600;}
+  .nav-link i{width:18px;text-align:center;font-size:0.9rem;}
+  .sidebar-footer{margin-top:auto;padding-top:16px;border-top:1px solid var(--border);}
+  .user-card{display:flex;align-items:center;gap:10px;padding:10px 12px;
+    background:var(--surface2);border-radius:12px;border:1px solid var(--border);}
+  .avatar{width:34px;height:34px;background:var(--primary);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;color:#fff;flex-shrink:0;}
+  .user-meta{flex:1;min-width:0;}
+  .user-name{font-size:0.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .user-role{font-size:0.7rem;color:var(--muted);}
+  .logout-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;
+    border-radius:6px;transition:color 0.2s;}
+  .logout-btn:hover{color:var(--danger);}
+
+  /* Main */
+  .main{margin-left:240px;flex:1;padding:28px 32px;min-height:100vh;}
+
+  /* Topbar */
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;}
+  .page-heading h1{font-size:1.5rem;font-weight:800;letter-spacing:-0.5px;}
+  .page-heading p{font-size:0.85rem;color:var(--muted);margin-top:2px;}
+  .topbar-actions{display:flex;gap:10px;}
+  .btn-icon{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:10px;
+    font-size:0.82rem;font-weight:600;border:1px solid var(--border);
+    background:var(--surface);color:var(--text);cursor:pointer;transition:all 0.2s;}
+  .btn-icon:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light);}
+  .btn-icon.primary{background:var(--primary);border-color:var(--primary);color:#fff;}
+  .btn-icon.primary:hover{background:var(--dark-blue);}
+
+  /* Stat Cards */
+  .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:22px 24px;position:relative;overflow:hidden;
+    transition:transform 0.2s,box-shadow 0.2s;box-shadow:0 2px 8px rgba(0,0,0,0.04);}
+  .stat-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,0.08);}
+  .stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+    border-radius:var(--radius) var(--radius) 0 0;}
+  .stat-card.total::after{background:var(--primary);}
+  .stat-card.free::after {background:var(--success);}
+  .stat-card.occ::after  {background:var(--danger);}
+  .stat-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;}
+  .stat-badge{width:42px;height:42px;border-radius:11px;
+    display:flex;align-items:center;justify-content:center;font-size:1rem;}
+  .stat-card.total .stat-badge{background:var(--primary-light);color:var(--primary);}
+  .stat-card.free  .stat-badge{background:var(--success-light);color:var(--success);}
+  .stat-card.occ   .stat-badge{background:var(--danger-light); color:var(--danger);}
+  .stat-pct{font-size:0.75rem;font-weight:600;padding:3px 8px;border-radius:20px;}
+  .stat-card.total .stat-pct{background:var(--primary-light);color:var(--primary);}
+  .stat-card.free  .stat-pct{background:var(--success-light);color:var(--success);}
+  .stat-card.occ   .stat-pct{background:var(--danger-light); color:var(--danger);}
+  .stat-value{font-size:2.4rem;font-weight:800;letter-spacing:-1px;line-height:1;}
+  .stat-card.total .stat-value{color:var(--primary);}
+  .stat-card.free  .stat-value{color:var(--success);}
+  .stat-card.occ   .stat-value{color:var(--danger);}
+  .stat-label{font-size:0.8rem;color:var(--muted);margin-top:4px;}
+  .stat-bar{height:5px;background:var(--surface2);border-radius:3px;margin-top:16px;overflow:hidden;}
+  .stat-bar-fill{height:100%;border-radius:3px;transition:width 0.6s cubic-bezier(.4,0,.2,1);}
+  .stat-card.total .stat-bar-fill{background:var(--primary);}
+  .stat-card.free  .stat-bar-fill{background:var(--success);}
+  .stat-card.occ   .stat-bar-fill{background:var(--danger);}
+
+  /* Panel */
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    overflow:hidden;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.04);}
+  .panel-header{display:flex;justify-content:space-between;align-items:center;
+    padding:16px 22px;border-bottom:1px solid var(--border);}
+  .panel-title{font-size:0.95rem;font-weight:700;display:flex;align-items:center;gap:8px;}
+  .panel-title i{color:var(--primary);}
+  .panel-body{padding:20px 22px;}
+
+  /* Slots grid */
+  .slots-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:12px;}
+  .slot{aspect-ratio:1;border-radius:12px;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:3px;cursor:pointer;
+    border:2px solid transparent;transition:all 0.2s;position:relative;font-size:0.7rem;font-weight:600;}
+  .slot.free    {background:var(--success-light);border-color:var(--success);color:var(--success);}
+  .slot.occupied{background:var(--danger-light); border-color:var(--danger); color:var(--danger);}
+  .slot.reserved{background:var(--warning-light);border-color:var(--warning);color:var(--warning);}
+  .slot:hover   {transform:scale(1.07);box-shadow:0 4px 14px rgba(0,0,0,0.1);}
+  .slot-num {font-size:1.1rem;font-weight:800;}
+  .slot-icon{font-size:0.9rem;}
+  .slot-lbl {font-size:0.6rem;text-transform:uppercase;letter-spacing:0.5px;}
+
+  /* Slot detail modal */
+  .slot-detail-modal .modal-box{ max-width:380px; }
+  .slot-detail-header{
+    display:flex; align-items:center; gap:14px;
+    padding:20px 22px; border-bottom:1px solid var(--border);
+  }
+  .slot-detail-icon{
+    width:52px; height:52px; border-radius:14px;
+    display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0;
+  }
+  .slot-detail-icon.free    { background:var(--success-light); color:var(--success); }
+  .slot-detail-icon.occupied{ background:var(--danger-light);  color:var(--danger); }
+  .slot-detail-icon.reserved{ background:var(--warning-light); color:var(--warning); }
+  .slot-detail-title{ font-size:1.1rem; font-weight:800; }
+  .slot-detail-sub  { font-size:0.78rem; color:var(--muted); margin-top:2px; }
+  .detail-rows{ padding:18px 22px; display:flex; flex-direction:column; gap:10px; }
+  .detail-row{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 14px; background:var(--surface2);
+    border-radius:10px; border:1px solid var(--border);
+  }
+  .detail-key{ font-size:0.8rem; color:var(--muted); font-weight:500; display:flex; align-items:center; gap:7px; }
+  .detail-key i{ color:var(--primary); width:14px; text-align:center; }
+  .detail-val{ font-size:0.85rem; font-weight:700; }
+  .detail-val.free    { color:var(--success); }
+  .detail-val.occupied{ color:var(--danger); }
+  .detail-val.reserved{ color:var(--warning); }
+  .slot-detail-actions{ padding:0 22px 20px; display:flex; gap:10px; }
+  .btn-reserve-now{
+    flex:1; background:var(--primary); color:#fff; border:none;
+    padding:11px; border-radius:10px; font-size:0.85rem; font-weight:700;
+    cursor:pointer; transition:all 0.2s;
+  }
+  .btn-reserve-now:hover{ background:var(--dark-blue); transform:translateY(-1px); }
+  .btn-reserve-now:disabled{ background:var(--surface2); color:var(--muted); cursor:not-allowed; transform:none; border:1px solid var(--border); }
+  .btn-close-detail{
+    padding:11px 18px; background:var(--surface2); color:var(--text);
+    border:1px solid var(--border); border-radius:10px; font-size:0.85rem;
+    font-weight:600; cursor:pointer; transition:all 0.2s;
+  }
+  .btn-close-detail:hover{ border-color:var(--primary); color:var(--primary); }
+
+  /* Parking info panel */
+  .info-item{
+    display:flex; align-items:flex-start; gap:12px;
+    padding:12px 14px; border-radius:10px;
+    background:var(--surface2); border:1px solid var(--border);
+    margin-bottom:10px;
+  }
+  .info-item:last-child{ margin-bottom:0; }
+  .info-item-icon{
+    width:36px; height:36px; border-radius:9px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:0.95rem;
+  }
+  .info-item-text h4{ font-size:0.82rem; font-weight:700; margin-bottom:2px; }
+  .info-item-text p { font-size:0.75rem; color:var(--muted); line-height:1.4; margin:0; }
+
+  /* Live feed — hidden until slots loaded */
+  .feed-wrap{position:relative;background:#000;border-radius:10px;overflow:hidden;}
+  #userCanvas{width:100%;display:block;border-radius:10px;}
+  .feed-badge{position:absolute;top:12px;left:12px;background:rgba(255,255,255,0.92);
+    backdrop-filter:blur(6px);border:1px solid var(--border);border-radius:20px;
+    padding:4px 12px;font-size:0.72rem;font-weight:700;
+    display:flex;align-items:center;gap:6px;color:var(--text);}
+  .live-dot{width:7px;height:7px;border-radius:50%;background:var(--success);animation:pulse 1.5s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(1.3);}}
+  .feed-overlay{position:absolute;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;background:rgba(248,249,250,0.92);
+    font-size:0.9rem;color:var(--muted);gap:10px;}
+  .feed-overlay i{font-size:2rem;color:var(--primary);opacity:0.35;}
+
+  /* Right column */
+  .content-grid{display:grid;grid-template-columns:1fr 300px;gap:20px;}
+  .right-col{display:flex;flex-direction:column;gap:20px;}
+
+  /* Occupancy ring */
+  .ring-wrap{display:flex;flex-direction:column;align-items:center;padding:20px 0 14px;}
+  .ring-svg{width:130px;height:130px;}
+  .ring-track{fill:none;stroke:var(--surface2);stroke-width:12;}
+  .ring-fill{fill:none;stroke-width:12;stroke-linecap:round;stroke:var(--primary);
+    stroke-dasharray:339.3;stroke-dashoffset:339.3;
+    transform:rotate(-90deg);transform-origin:50% 50%;
+    transition:stroke-dashoffset 0.8s cubic-bezier(.4,0,.2,1),stroke 0.4s;}
+  .ring-label{text-anchor:middle;dominant-baseline:middle;}
+  .ring-pct{font-size:1.5rem;font-weight:800;fill:var(--text);}
+  .ring-sub{font-size:0.55rem;fill:var(--muted);}
+  .ring-meta{display:flex;gap:18px;margin-top:14px;}
+  .ring-meta-item{text-align:center;}
+  .ring-meta-val{font-size:1rem;font-weight:700;}
+  .ring-meta-lbl{font-size:0.7rem;color:var(--muted);}
+
+  /* Activity */
+  .activity-list{display:flex;flex-direction:column;gap:8px;max-height:200px;overflow-y:auto;}
+  .activity-list::-webkit-scrollbar{width:4px;}
+  .activity-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+  .activity-item{display:flex;align-items:center;gap:10px;padding:9px 12px;
+    border-radius:10px;background:var(--surface2);border:1px solid var(--border);font-size:0.8rem;}
+  .activity-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .activity-dot.free    {background:var(--success);}
+  .activity-dot.occupied{background:var(--danger);}
+  .activity-text{flex:1;}
+  .activity-time{color:var(--muted);font-size:0.72rem;white-space:nowrap;}
+
+  /* Modals */
+  .modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);
+    backdrop-filter:blur(3px);z-index:500;align-items:center;justify-content:center;}
+  .modal-backdrop.open{display:flex;}
+  .modal-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;
+    width:90%;max-width:480px;max-height:80vh;display:flex;flex-direction:column;
+    box-shadow:0 20px 50px rgba(0,0,0,0.15);animation:modalIn 0.22s ease;}
+  @keyframes modalIn{from{opacity:0;transform:scale(0.96) translateY(16px);}to{opacity:1;transform:none;}}
+  .modal-head{display:flex;justify-content:space-between;align-items:center;
+    padding:18px 22px;border-bottom:1px solid var(--border);}
+  .modal-head h3{font-size:1rem;font-weight:700;display:flex;align-items:center;gap:8px;}
+  .modal-head h3 i{color:var(--primary);}
+  .modal-close{background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer;}
+  .modal-close:hover{color:var(--danger);}
+  .modal-body{padding:18px 22px;overflow-y:auto;}
+  .slots-table{width:100%;border-collapse:collapse;}
+  .slots-table th{font-size:0.72rem;color:var(--muted);text-transform:uppercase;
+    letter-spacing:0.8px;padding:8px 10px;text-align:left;}
+  .slots-table td{padding:10px;border-top:1px solid var(--border);font-size:0.85rem;}
+  .badge-free{background:var(--success-light);color:var(--success);padding:3px 10px;
+    border-radius:20px;font-size:0.72rem;font-weight:600;}
+  .reserve-btn{background:var(--primary);color:#fff;border:none;padding:5px 14px;
+    border-radius:8px;font-size:0.78rem;font-weight:600;cursor:pointer;transition:all 0.2s;}
+  .reserve-btn:hover{background:var(--dark-blue);}
+  .reserve-btn:disabled{background:var(--surface2);color:var(--muted);cursor:not-allowed;border:1px solid var(--border);}
+  .form-group{margin-bottom:14px;}
+  .form-label{font-size:0.78rem;color:var(--text);font-weight:600;text-transform:uppercase;
+    letter-spacing:0.5px;display:block;margin-bottom:6px;}
+  .form-ctrl{width:100%;background:var(--surface2);border:2px solid var(--border);
+    border-radius:10px;padding:10px 14px;color:var(--text);font-size:0.875rem;
+    outline:none;transition:border-color 0.2s;font-family:'Inter',sans-serif;}
+  .form-ctrl:focus{border-color:var(--primary);background:#fff;}
+  .btn-confirm{width:100%;background:var(--primary);color:#fff;border:none;
+    padding:12px;border-radius:12px;font-size:0.9rem;font-weight:700;
+    cursor:pointer;transition:all 0.2s;margin-top:4px;}
+  .btn-confirm:hover{background:var(--dark-blue);transform:translateY(-1px);
+    box-shadow:0 4px 12px rgba(13,110,253,0.25);}
+
+  /* Empty state */
+  .empty-state{text-align:center;padding:36px 20px;color:var(--muted);}
+  .empty-state i{font-size:2.2rem;color:var(--primary);opacity:0.25;margin-bottom:10px;display:block;}
+  .empty-state p{font-size:0.85rem;}
+
+  /* Toast */
+  #toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border);
+    border-radius:12px;padding:13px 18px;font-size:0.85rem;font-weight:500;color:var(--text);
+    box-shadow:0 8px 24px rgba(0,0,0,0.1);z-index:9999;display:flex;align-items:center;gap:10px;
+    transform:translateY(70px);opacity:0;transition:all 0.3s cubic-bezier(.4,0,.2,1);max-width:300px;}
+  #toast.show{transform:translateY(0);opacity:1;}
+
+  /* Responsive */
+  @media(max-width:1100px){.content-grid{grid-template-columns:1fr;}.right-col{display:grid;grid-template-columns:1fr 1fr;}}
+  @media(max-width:900px) {.stats-row{grid-template-columns:1fr 1fr;}}
+  @media(max-width:768px) {
+    .sidebar{width:64px;padding:16px 8px;}
+    .brand-name,.nav-link span,.user-meta{display:none;}
+    .nav-link{justify-content:center;}
+    .user-card{justify-content:center;}
+    .main{margin-left:64px;padding:20px 16px;}
+    .stats-row{grid-template-columns:1fr;}
+    .right-col{grid-template-columns:1fr;}
+  }
+</style>
+<body>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="brand">
+    <div class="brand-icon"><i class="fas fa-parking"></i></div>
+    <span class="brand-name">SMART<span>PARK</span></span>
+  </div>
+  <ul style="list-style:none;padding:0;">
+    <li class="nav-section">Menu</li>
+    <li class="nav-item"><a class="nav-link active" href="#"><i class="fas fa-th-large"></i><span>Dashboard</span></a></li>
+    <li class="nav-item"><button class="nav-link" onclick="getFreeSlots()"><i class="fas fa-search"></i><span>Find Slot</span></button></li>
+    <li class="nav-item"><button class="nav-link" onclick="refreshData()"><i class="fas fa-sync-alt"></i><span>Refresh</span></button></li>
+    <li class="nav-item"><button class="nav-link" onclick="restartProcess()"><i class="fas fa-redo"></i><span>Restart</span></button></li>
+  </ul>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="avatar">{{ username[0]|upper if username else 'U' }}</div>
+      <div class="user-meta">
+        <div class="user-name">{{ username }}</div>
+        <div class="user-role">{{ role|default('User') }}</div>
+      </div>
+      <a href="/logout" class="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+    </div>
+  </div>
+</nav>
+
+<!-- Main -->
+<main class="main">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="page-heading">
+      <h1>Parking Dashboard</h1>
+      <p id="lastUpdated">Waiting for data...</p>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn-icon" onclick="getFreeSlots()"><i class="fas fa-search"></i> Find Slot</button>
+      <button class="btn-icon primary" onclick="refreshData()"><i class="fas fa-sync-alt"></i> Refresh</button>
+    </div>
+  </div>
+
+  <!-- Stat Cards -->
+  <div class="stats-row">
+    <div class="stat-card total">
+      <div class="stat-top"><div class="stat-badge"><i class="fas fa-parking"></i></div><span class="stat-pct">100%</span></div>
+      <div class="stat-value" id="totalSpaces">0</div>
+      <div class="stat-label">Total Spaces</div>
+      <div class="stat-bar"><div class="stat-bar-fill" id="totalProgress" style="width:100%"></div></div>
+    </div>
+    <div class="stat-card free">
+      <div class="stat-top"><div class="stat-badge"><i class="fas fa-check-circle"></i></div><span class="stat-pct" id="freePct">—</span></div>
+      <div class="stat-value" id="freeSpaces">0</div>
+      <div class="stat-label">Available</div>
+      <div class="stat-bar"><div class="stat-bar-fill" id="freeProgress" style="width:0%"></div></div>
+    </div>
+    <div class="stat-card occ">
+      <div class="stat-top"><div class="stat-badge"><i class="fas fa-times-circle"></i></div><span class="stat-pct" id="occPct">—</span></div>
+      <div class="stat-value" id="occupiedSpaces">0</div>
+      <div class="stat-label">Occupied</div>
+      <div class="stat-bar"><div class="stat-bar-fill" id="occupiedProgress" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <!-- Content Grid -->
+  <div class="content-grid">
+
+    <!-- Left column -->
+    <div>
+
+      <!-- 1. SLOTS PANEL — always shown first -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title"><i class="fas fa-car"></i> Parking Slots</span>
+          <span style="font-size:0.75rem;color:var(--muted);">Click a slot for details</span>
+        </div>
+        <div class="panel-body">
+          <div class="slots-grid" id="userSlotsGrid">
+            <div class="empty-state" style="grid-column:1/-1;">
+              <i class="fas fa-parking"></i>
+              <p>Waiting for admin to process a video...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. LIVE FEED — hidden until slots are available -->
+      <div class="panel" id="liveFeedPanel" style="display:none;">
+        <div class="panel-header">
+          <span class="panel-title"><i class="fas fa-video"></i> Live Parking View</span>
+          <span id="feedStatus" style="font-size:0.75rem;color:var(--muted);">Connecting...</span>
+        </div>
+        <div class="panel-body" style="padding:16px;">
+          <div class="feed-wrap">
+            <canvas id="userCanvas" width="1280" height="720"></canvas>
+            <div class="feed-badge"><div class="live-dot"></div> LIVE</div>
+            <div class="feed-overlay" id="feedOverlay">
+              <i class="fas fa-satellite-dish"></i>
+              <span>Loading frame...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right column -->
+    <div class="right-col">
+
+      <!-- Occupancy Ring -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title"><i class="fas fa-circle-notch"></i> Occupancy Rate</span>
+        </div>
+        <div class="ring-wrap">
+          <svg class="ring-svg" viewBox="0 0 120 120">
+            <circle class="ring-track" cx="60" cy="60" r="54"/>
+            <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="54"/>
+            <text class="ring-label" x="60" y="57">
+              <tspan class="ring-pct" id="ringPct" x="60" dy="0">0%</tspan>
+            </text>
+            <text class="ring-label" x="60" y="72">
+              <tspan class="ring-sub" x="60">OCCUPIED</tspan>
+            </text>
+          </svg>
+          <div class="ring-meta">
+            <div class="ring-meta-item">
+              <div class="ring-meta-val" id="ringFree" style="color:var(--success);">0</div>
+              <div class="ring-meta-lbl">Free</div>
+            </div>
+            <div class="ring-meta-item">
+              <div class="ring-meta-val" id="ringOcc" style="color:var(--danger);">0</div>
+              <div class="ring-meta-lbl">Occupied</div>
+            </div>
+            <div class="ring-meta-item">
+              <div class="ring-meta-val" id="ringTotal" style="color:var(--primary);">0</div>
+              <div class="ring-meta-lbl">Total</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Parking Info Panel (replaces activity feed) -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title"><i class="fas fa-info-circle"></i> Parking Guide</span>
+        </div>
+        <div class="panel-body" style="padding:14px 16px;">
+          <div class="info-item">
+            <div class="info-item-icon" style="background:var(--success-light);color:var(--success);">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="info-item-text">
+              <h4>Free Slot</h4>
+              <p>Green border means the space is available. Click to reserve it before you arrive.</p>
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-icon" style="background:var(--danger-light);color:var(--danger);">
+              <i class="fas fa-times-circle"></i>
+            </div>
+            <div class="info-item-text">
+              <h4>Occupied Slot</h4>
+              <p>Red border means a vehicle is detected in this space by the AI camera.</p>
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-icon" style="background:var(--warning-light);color:var(--warning);">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="info-item-text">
+              <h4>Reserved Slot</h4>
+              <p>Yellow border means you've reserved this slot. It will be held until your vehicle arrives.</p>
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-icon" style="background:var(--primary-light);color:var(--primary);">
+              <i class="fas fa-search"></i>
+            </div>
+            <div class="info-item-text">
+              <h4>Find a Slot</h4>
+              <p>Use the "Find Slot" button to see all available spaces and reserve one instantly.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<!-- Slot Detail Modal -->
+<div class="modal-backdrop slot-detail-modal" id="slotDetailModal">
+  <div class="modal-box" style="max-width:380px;">
+    <div class="slot-detail-header">
+      <div class="slot-detail-icon" id="sdIcon"><i class="fas fa-parking"></i></div>
+      <div>
+        <div class="slot-detail-title" id="sdTitle">Slot #—</div>
+        <div class="slot-detail-sub"  id="sdSub">—</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('slotDetailModal')" style="margin-left:auto;"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="detail-rows">
+      <div class="detail-row">
+        <span class="detail-key"><i class="fas fa-traffic-light"></i> Status</span>
+        <span class="detail-val" id="sdStatus">—</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-key"><i class="fas fa-car"></i> Vehicle</span>
+        <span class="detail-val" id="sdVehicle">—</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-key"><i class="fas fa-clock"></i> Since / ETA</span>
+        <span class="detail-val" id="sdTime">—</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-key"><i class="fas fa-hashtag"></i> Slot ID</span>
+        <span class="detail-val" id="sdId">—</span>
+      </div>
+    </div>
+    <div class="slot-detail-actions">
+      <button class="btn-reserve-now" id="sdReserveBtn" onclick="reserveFromDetail()">
+        <i class="fas fa-calendar-check"></i> Reserve This Slot
+      </button>
+      <button class="btn-close-detail" onclick="closeModal('slotDetailModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Find Slot Modal -->
+<div class="modal-backdrop" id="findModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3><i class="fas fa-search"></i> Available Slots</h3>
+      <button class="modal-close" onclick="closeModal('findModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <table class="slots-table" id="findTable">
+        <thead><tr><th>Slot</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="findTableBody"></tbody>
+      </table>
+      <div id="noFreeMsg" style="display:none;" class="empty-state">
+        <i class="fas fa-parking"></i><p>All slots are currently occupied.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Reserve Modal -->
+<div class="modal-backdrop" id="reserveModal">
+  <div class="modal-box" style="max-width:360px;">
+    <div class="modal-head">
+      <h3><i class="fas fa-calendar-check"></i> Reserve Slot #<span id="reserveSlotNum"></span></h3>
+      <button class="modal-close" onclick="closeModal('reserveModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Vehicle Type</label>
+        <select id="resVehicle" class="form-ctrl">
+          <option value="car">Car</option>
+          <option value="van">Van</option>
+          <option value="truck">Truck</option>
+          <option value="bus">Bus</option>
+          <option value="motor">Motorcycle</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Arriving in (minutes)</label>
+        <input type="number" id="resDuration" class="form-ctrl" value="15" min="1" max="120"/>
+      </div>
+      <button class="btn-confirm" onclick="confirmReservation()">Confirm Reservation</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"><i class="fas fa-info-circle" id="toastIcon"></i><span id="toastMsg"></span></div>
+<video id="sourceVideo" style="display:none;" preload="auto"></video>
+<script>
+let currentFilename='', refreshInterval;
+let slotsStatus=[], parkingStats={}, polygons=[];
+let reservedSlots=new Map(), reservingIndex=-1;
+let lastLoadId=0, lastFrameTime=0, prevStatus=[];
+let slotsEverLoaded=false;
+
+const canvas=document.getElementById('userCanvas');
+const ctx=canvas?canvas.getContext('2d'):null;
+const vehicleIcons={car:'fa-car',van:'fa-shuttle-van',truck:'fa-truck',bus:'fa-bus',
+  bicycle:'fa-bicycle',motor:'fa-motorcycle',tricycle:'fa-motorcycle','awning-tricycle':'fa-motorcycle'};
+
+document.addEventListener('DOMContentLoaded',async()=>{
+  await loadParkingStats();
+  refreshInterval=setInterval(()=>loadParkingStats(currentFilename),2000);
+});
+
+async function loadParkingStats(filename){
+  const id=++lastLoadId;
+  try{
+    const url=filename?`/api/parking-stats?filename=${encodeURIComponent(filename)}`:'/api/parking-stats';
+    const res=await fetch(url); if(!res.ok) throw new Error(res.status);
+    const data=await res.json(); if(id!==lastLoadId) return;
+    if(data.video){
+      const prev=currentFilename; currentFilename=data.video;
+    if(prev!==currentFilename){await loadPolygons(data.video);}
+    }
+    if(data.video&&polygons.length===0) await loadPolygons(data.video);
+    parkingStats=data; slotsStatus=data.slots_status||[];
+    updateStats(data); updateRing(data); renderSlots(data);
+    const hasSlots=data.video&&(data.slots_status||[]).length>0;
+    if(hasSlots&&!slotsEverLoaded){
+      slotsEverLoaded=true;
+      document.getElementById('liveFeedPanel').style.display='block';
+    }
+    if(data.frame&&ctx){
+      const img=new Image();
+      img.onload=()=>{
+        if(id!==lastLoadId) return;
+        lastFrameTime=Date.now();
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.drawImage(img,0,0,canvas.width,canvas.height);
+        drawPolygons();
+        document.getElementById('feedOverlay').style.display='none';
+        document.getElementById('feedStatus').textContent='Live';
+      };
+      img.src='data:image/jpeg;base64,'+data.frame;
+    } else if(slotsEverLoaded&&Date.now()-lastFrameTime>10000){
+      document.getElementById('feedOverlay').style.display='flex';
+    }
+    document.getElementById('lastUpdated').textContent='Last updated: '+new Date().toLocaleTimeString();
+  }catch(e){
+    const fs=document.getElementById('feedStatus'); if(fs) fs.textContent='Error';
+  }
+}
+
+async function loadPolygons(filename){
+  try{
+    const res=await fetch(`/get-polygons?filename=${encodeURIComponent(filename)}`);
+    const d=await res.json(); if(d.polygons) polygons=d.polygons;
+  }catch(e){}
+}
+
+function updateStats(d){
+  const total=d.total||0,free=d.free||0,occ=d.occupied||0;
+  setText('totalSpaces',total); setText('freeSpaces',free); setText('occupiedSpaces',occ);
+  setText('freePct',total>0?Math.round(free/total*100)+'%':'—');
+  setText('occPct', total>0?Math.round(occ/total*100)+'%':'—');
+  setWidth('freeProgress',    total>0?free/total*100:0);
+  setWidth('occupiedProgress',total>0?occ/total*100:0);
+}
+
+function updateRing(d){
+  const total=d.total||0,occ=d.occupied||0,free=d.free||0;
+  const pct=total>0?Math.round(occ/total*100):0;
+  const circ=2*Math.PI*54;
+  const fill=document.getElementById('ringFill');
+  if(fill){
+    fill.style.strokeDashoffset=circ-(circ*pct/100);
+    fill.style.stroke=pct>80?'var(--danger)':pct>50?'var(--warning)':'var(--primary)';
+  }
+  setText('ringPct',pct+'%'); setText('ringFree',free); setText('ringOcc',occ); setText('ringTotal',total);
+}
+
+function renderSlots(d){
+  const grid=document.getElementById('userSlotsGrid'); if(!grid) return;
+  if(!d||!d.video){
+    grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1;">
+      <i class="fas fa-video-slash"></i><p>${d.message||'Waiting for admin to process a video...'}</p></div>`;
+    return;
+  }
+  const status=d.slots_status||[],vehicles=d.slot_vehicles||{};
+  if(!status.length){
+    grid.innerHTML='<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-parking"></i><p>No slots defined yet</p></div>';
+    return;
+  }
+  const frag=document.createDocumentFragment();
+  status.forEach((isFree,i)=>{
+    const isRes=reservedSlots.has(i);
+    let cls=isFree?'free':'occupied'; if(isRes&&isFree) cls='reserved';
+    const vType=vehicles[i.toString()];
+    const icon=isFree?'fa-car':(vehicleIcons[vType]||'fa-car');
+    const lbl=isRes&&isFree?'Reserved':(isFree?'Free':'Occupied');
+    const el=document.createElement('div');
+    el.className=`slot ${cls}`;
+    el.onclick=e=>{e.stopPropagation(); openSlotDetail(i,d);};
+    el.innerHTML=`<span class="slot-num">${i+1}</span>
+      <i class="fas ${icon} slot-icon"></i>
+      <span class="slot-lbl">${lbl}</span>`;
+    frag.appendChild(el);
+  });
+  grid.innerHTML=''; grid.appendChild(frag);
+}
+
+// ── Slot Detail Modal ──────────────────────────────────────────────────────
+function openSlotDetail(i, d, e){
+  const status=d.slots_status||[], vehicles=d.slot_vehicles||{}, times=d.occupancy_times||{};
+  const isFree=status[i]; const isRes=reservedSlots.has(i);
+  const res=reservedSlots.get(i);
+  const vType=vehicles[i.toString()];
+
+  let cls=isFree?'free':'occupied'; if(isRes&&isFree) cls='reserved';
+  const lbl=isRes&&isFree?'Reserved':(isFree?'Free':'Occupied');
+  const icon=isFree?'fa-check-circle':(isRes?'fa-clock':'fa-times-circle');
+  const vehicle=isRes?res.vehicleType:(vType||(isFree?'None detected':'Vehicle'));
+  const timeLabel=isRes?res.duration+' mins (arriving)':(isFree?'—':(times[i.toString()]||'N/A'));
+
+  // Icon box
+  const sdIcon=document.getElementById('sdIcon');
+  sdIcon.className=`slot-detail-icon ${cls}`;
+  sdIcon.innerHTML=`<i class="fas ${icon}"></i>`;
+
+  setText('sdTitle',`Slot #${i+1}`);
+  setText('sdSub', currentFilename||'Parking Lot');
+
+  const sdStatus=document.getElementById('sdStatus');
+  sdStatus.textContent=lbl; sdStatus.className=`detail-val ${cls}`;
+
+  setText('sdVehicle', vehicle.charAt(0).toUpperCase()+vehicle.slice(1));
+  setText('sdTime', timeLabel);
+  setText('sdId', `P-${String(i+1).padStart(3,'0')}`);
+
+  // Reserve button
+  const btn=document.getElementById('sdReserveBtn');
+  if(isFree&&!isRes){
+    btn.disabled=false; btn.innerHTML='<i class="fas fa-calendar-check"></i> Reserve This Slot';
+    btn.onclick=()=>{ closeModal('slotDetailModal'); reservingIndex=i; document.getElementById('reserveSlotNum').textContent=i+1; openModal('reserveModal'); };
+  } else if(isRes){
+    btn.disabled=true; btn.innerHTML='<i class="fas fa-check"></i> Already Reserved';
+  } else {
+    btn.disabled=true; btn.innerHTML='<i class="fas fa-ban"></i> Slot Occupied';
+  }
+
+  openModal('slotDetailModal');
+}
+
+function drawPolygons(){
+  if(!ctx||!polygons.length) return;
+  polygons.forEach((poly,i)=>{
+    if(poly.length<3) return;
+    const isFree=slotsStatus[i];
+    ctx.strokeStyle=isFree?'#198754':'#dc3545';
+    ctx.fillStyle=isFree?'rgba(25,135,84,0.12)':'rgba(220,53,69,0.12)';
+    ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(poly[0][0],poly[0][1]);
+    poly.slice(1).forEach(p=>ctx.lineTo(p[0],p[1]));
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    const cx=poly.reduce((s,p)=>s+p[0],0)/poly.length;
+    const cy=poly.reduce((s,p)=>s+p[1],0)/poly.length;
+    ctx.fillStyle='#fff'; ctx.font='bold 14px Inter,Arial';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(i+1,cx,cy);
+  });
+}
+
+function getFreeSlots(){
+  const body=document.getElementById('findTableBody');
+  const noMsg=document.getElementById('noFreeMsg');
+  const tbl=document.getElementById('findTable');
+  body.innerHTML=''; let count=0;
+  slotsStatus.forEach((isFree,i)=>{
+    if(!isFree) return; count++;
+    const isRes=reservedSlots.has(i);
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><i class="fas fa-parking" style="color:var(--primary);margin-right:8px;"></i>Slot ${i+1}</td>
+      <td><span class="badge-free">Available</span></td>
+      <td><button class="reserve-btn" onclick="openReserve(${i})" ${isRes?'disabled':''}>
+        ${isRes?'Reserved':'Reserve'}</button></td>`;
+    body.appendChild(tr);
+  });
+  noMsg.style.display=count?'none':'block';
+  tbl.style.display=count?'table':'none';
+  openModal('findModal');
+}
+
+function openReserve(i){
+  reservingIndex=i;
+  document.getElementById('reserveSlotNum').textContent=i+1;
+  closeModal('findModal'); openModal('reserveModal');
+}
+
+function reserveFromDetail(){
+  closeModal('slotDetailModal');
+  document.getElementById('reserveSlotNum').textContent=reservingIndex+1;
+  openModal('reserveModal');
+}
+
+function confirmReservation(){
+  const vehicle=document.getElementById('resVehicle').value;
+  const duration=parseInt(document.getElementById('resDuration').value);
+  if(!duration||duration<1){showToast('Enter a valid duration','warning');return;}
+  reservedSlots.set(reservingIndex,{vehicleType:vehicle,duration,time:new Date().toLocaleTimeString()});
+  showToast(`Slot #${reservingIndex+1} reserved — arriving in ${duration} mins`,'success');
+  closeModal('reserveModal'); reservingIndex=-1;
+  renderSlots(parkingStats);
+}
+
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+window.addEventListener('click',e=>{
+  ['findModal','reserveModal','slotDetailModal'].forEach(id=>{
+    const m=document.getElementById(id); if(e.target===m) m.classList.remove('open');
+  });
+});
+
+let toastTimer;
+function showToast(msg,type='info'){
+  const t=document.getElementById('toast'),icon=document.getElementById('toastIcon');
+  const colors={success:'var(--success)',error:'var(--danger)',warning:'var(--warning)',info:'var(--primary)'};
+  const icons={success:'fa-check-circle',error:'fa-exclamation-circle',warning:'fa-exclamation-triangle',info:'fa-info-circle'};
+  icon.className=`fas ${icons[type]||icons.info}`; icon.style.color=colors[type]||colors.info;
+  document.getElementById('toastMsg').textContent=msg;
+  t.classList.add('show'); clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+async function refreshData(){showToast('Refreshing...','info');await loadParkingStats(currentFilename);}
+
+async function restartProcess(){
+  if(!confirm('Reset the dashboard view?')) return;
+  currentFilename=''; slotsStatus=[]; polygons=[];
+  reservedSlots.clear(); prevStatus=[]; slotsEverLoaded=false;
+  if(ctx) ctx.clearRect(0,0,canvas.width,canvas.height);
+  document.getElementById('liveFeedPanel').style.display='none';
+  document.getElementById('feedOverlay').style.display='flex';
+  updateStats({total:0,free:0,occupied:0}); updateRing({total:0,free:0,occupied:0});
+  renderSlots({});
+  await loadParkingStats();
+}
+
+function setText(id,v){const el=document.getElementById(id);if(el)el.textContent=v;}
+function setWidth(id,pct){const el=document.getElementById(id);if(el)el.style.width=pct+'%';}
+window.addEventListener('beforeunload',()=>clearInterval(refreshInterval));
+
+// ── Data ───────────────────────────────────────────────────────────────────
+async function loadParkingStats(filename) {
+  const id = ++lastLoadId;
+  try {
+    const url = filename
+      ? `/api/parking-stats?filename=${encodeURIComponent(filename)}`
+      : '/api/parking-stats';
+    const res  = await fetch(url);
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
+    if (id !== lastLoadId) return;
+
+    if (data.video) {
+      const prev = currentFilename; currentFilename = data.video;
+    if (prev !== currentFilename) { await loadPolygons(data.video); }
+    }
+    if (data.video && polygons.length === 0) await loadPolygons(data.video);
+
+    parkingStats = data; slotsStatus = data.slots_status || [];
+    updateStats(data); updateRing(data); renderSlots(data); trackActivity(data);
+
+    // Reveal video panel only after slots are available
+    const hasSlots = data.video && (data.slots_status || []).length > 0;
+    if (hasSlots && !slotsEverLoaded) {
+      slotsEverLoaded = true;
+      document.getElementById('liveFeedPanel').style.display = 'block';
+    }
+
+    // Draw frame
+    if (data.frame && ctx) {
+      const img = new Image();
+      img.onload = () => {
+        if (id !== lastLoadId) return;
+        lastFrameTime = Date.now();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        drawPolygons();
+        document.getElementById('feedOverlay').style.display = 'none';
+        document.getElementById('feedStatus').textContent = 'Live';
+      };
+      img.src = 'data:image/jpeg;base64,' + data.frame;
+    } else if (slotsEverLoaded && Date.now() - lastFrameTime > 10000) {
+      document.getElementById('feedOverlay').style.display = 'flex';
+    }
+
+    document.getElementById('lastUpdated').textContent =
+      'Last updated: ' + new Date().toLocaleTimeString();
+  } catch(e) {
+    if (document.getElementById('feedStatus'))
+      document.getElementById('feedStatus').textContent = 'Error';
+  }
+}
+
+async function loadPolygons(filename) {
+  try {
+    const res = await fetch(`/get-polygons?filename=${encodeURIComponent(filename)}`);
+    const d   = await res.json();
+    if (d.polygons) polygons = d.polygons;
+  } catch(e) {}
+}
+
+// ── Stats ──────────────────────────────────────────────────────────────────
+function updateStats(d) {
+  const total=d.total||0, free=d.free||0, occ=d.occupied||0;
+  setText('totalSpaces', total); setText('freeSpaces', free); setText('occupiedSpaces', occ);
+  setText('freePct', total>0 ? Math.round(free/total*100)+'%' : '—');
+  setText('occPct',  total>0 ? Math.round(occ/total*100)+'%'  : '—');
+  setWidth('freeProgress',     total>0 ? free/total*100 : 0);
+  setWidth('occupiedProgress', total>0 ? occ/total*100  : 0);
+}
+
+function updateRing(d) {
+  const total=d.total||0, occ=d.occupied||0, free=d.free||0;
+  const pct = total>0 ? Math.round(occ/total*100) : 0;
+  const circ = 2*Math.PI*54;
+  const fill = document.getElementById('ringFill');
+  if (fill) {
+    fill.style.strokeDashoffset = circ - (circ*pct/100);
+    fill.style.stroke = pct>80 ? 'var(--danger)' : pct>50 ? 'var(--warning)' : 'var(--primary)';
+  }
+  setText('ringPct', pct+'%'); setText('ringFree', free);
+  setText('ringOcc', occ);    setText('ringTotal', total);
+}
+
+// ── Slots ──────────────────────────────────────────────────────────────────
+function renderSlots(d) {
+  const grid = document.getElementById('userSlotsGrid'); if (!grid) return;
+  if (!d || !d.video) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
+      <i class="fas fa-video-slash"></i>
+      <p>${d.message || 'Waiting for admin to process a video...'}</p></div>`;
+    return;
+  }
+  const status=d.slots_status||[], vehicles=d.slot_vehicles||{}, times=d.occupancy_times||{};
+  if (!status.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-parking"></i><p>No slots defined yet</p></div>';
+    return;
+  }
+  const frag = document.createDocumentFragment();
+  status.forEach((isFree, i) => {
+    const isRes = reservedSlots.has(i);
+    let cls = isFree ? 'free' : 'occupied'; if (isRes && isFree) cls = 'reserved';
+    const vType = vehicles[i.toString()];
+    const icon  = isFree ? 'fa-car' : (vehicleIcons[vType] || 'fa-car');
+    const lbl   = isRes && isFree ? 'Reserved' : (isFree ? 'Free' : 'Occupied');
+    const el = document.createElement('div');
+    el.className = `slot ${cls}`;
+    el.onclick = e => { e.stopPropagation(); openSlotDetail(i, d); };
+    el.innerHTML = `<span class="slot-num">${i+1}</span>
+      <i class="fas ${icon} slot-icon"></i>
+      <span class="slot-lbl">${lbl}</span>`;
+    frag.appendChild(el);
+  });
+  grid.innerHTML = ''; grid.appendChild(frag);
+}
+
+
+
+// ── Canvas ─────────────────────────────────────────────────────────────────
+function drawPolygons() {
+  if (!ctx || !polygons.length) return;
+  polygons.forEach((poly, i) => {
+    if (poly.length < 3) return;
+    const isFree = slotsStatus[i];
+    ctx.strokeStyle = isFree ? '#198754' : '#dc3545';
+    ctx.fillStyle   = isFree ? 'rgba(25,135,84,0.12)' : 'rgba(220,53,69,0.12)';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(poly[0][0], poly[0][1]);
+    poly.slice(1).forEach(p => ctx.lineTo(p[0], p[1]));
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    const cx = poly.reduce((s,p)=>s+p[0],0)/poly.length;
+    const cy = poly.reduce((s,p)=>s+p[1],0)/poly.length;
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 14px Inter,Arial';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(i+1, cx, cy);
+  });
+}
+
+// ── Activity ───────────────────────────────────────────────────────────────
+function trackActivity(d) {
+  // kept for compatibility — no-op since activity panel removed
+  prevStatus = [...(d.slots_status||[])];
+}
+
+</script>
+</body>
+</html>

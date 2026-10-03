@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Access Portal | Smart Parking System</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+      :root {
+        --primary-accent: #0d6efd;
+        --glass-bg: rgba(255, 255, 255, 0.95);
+        --glass-border: rgba(13, 110, 253, 0.15);
+        --text-bright: #212529;
+        --text-dim: #6c757d;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        /* Parking Background with Blue Tint to match Home */
+        background: linear-gradient(rgba(13, 110, 253, 0.1), rgba(13, 110, 253, 0.1)), 
+                    url('https://images.unsplash.com/photo-1573348722427-f1d6819fdf98?q=80&w=2070&auto=format&fit=crop');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        padding: 20px;
+      }
+
+      .auth-container {
+        width: 100%;
+        max-width: 480px;
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 30px;
+        padding: 45px;
+        box-shadow: 0 25px 50px rgba(13, 110, 253, 0.15);
+      }
+
+      .brand-logo {
+        text-align: center;
+        margin-bottom: 35px;
+      }
+
+      .brand-logo i {
+        font-size: 2.5rem;
+        color: var(--primary-accent);
+        margin-bottom: 15px;
+      }
+
+      .brand-logo h1 {
+        font-weight: 800;
+        font-size: 1.5rem;
+        letter-spacing: -0.5px;
+        color: var(--text-bright);
+      }
+
+      .form-title {
+        font-weight: 700;
+        font-size: 1.25rem;
+        color: var(--text-bright);
+        margin-bottom: 8px;
+        text-align: center;
+      }
+
+      .form-subtitle {
+        color: var(--text-dim);
+        font-size: 0.9rem;
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-label {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: var(--text-bright);
+        margin-bottom: 8px;
+        padding-left: 4px;
+        opacity: 0.9;
+      }
+
+      .input-group-custom {
+        position: relative;
+      }
+
+      .input-group-custom i {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-dim);
+        transition: color 0.3s;
+      }
+
+      .form-control, .form-select {
+        border: 2px solid #f1f5f9;
+        border-radius: 15px;
+        padding: 12px 16px 12px 45px;
+        font-size: 0.95rem;
+        background: #f8fafc;
+        color: #1e293b;
+        transition: all 0.3s;
+      }
+
+      .form-control::placeholder {
+        color: #94a3b8;
+      }
+
+      .form-control:focus, .form-select:focus {
+        background: #fff;
+        border-color: var(--primary-accent);
+        box-shadow: 0 0 15px rgba(13, 110, 253, 0.1);
+        outline: none;
+        color: #1e293b;
+      }
+
+      .form-control:focus + i {
+        color: var(--primary-accent);
+      }
+
+      .btn-auth {
+        background: var(--primary-accent);
+        color: #ffffff;
+        border: none;
+        border-radius: 15px;
+        padding: 14px;
+        font-weight: 700;
+        width: 100%;
+        margin-top: 10px;
+        transition: all 0.3s;
+        box-shadow: 0 10px 15px -3px rgba(13, 110, 253, 0.2);
+      }
+
+      .btn-auth:hover {
+        background: #0a58ca;
+        transform: translateY(-2px);
+        box-shadow: 0 15px 20px -3px rgba(13, 110, 253, 0.3);
+      }
+
+      .back-home {
+        display: block;
+        text-align: center;
+        margin-top: 25px;
+        color: var(--text-dim);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: color 0.3s;
+      }
+
+      .back-home:hover {
+        color: var(--primary-accent);
+      }
+
+      .alert {
+        border-radius: 15px;
+        padding: 12px 16px;
+        margin-bottom: 20px;
+        font-size: 0.85rem;
+        background: #fef2f2;
+        color: #991b1b;
+        border: 1px solid #fee2e2;
+      }
+
+      .hidden { display: none !important; }
+
+      .toggle-link {
+        color: var(--primary-accent);
+        text-decoration: none;
+        font-weight: 700;
+      }
+
+      .form-select {
+        padding-left: 16px;
+      }
+      .form-select option {
+        background: #fff;
+        color: #1e293b;
+      }
+
+      /* Mobile adjustments */
+      @media (max-width: 480px) {
+        .auth-container {
+          padding: 30px 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="auth-container">
+      <div class="brand-logo">
+        <i class="fas fa-parking"></i>
+        <h1>SMART PARKING</h1>
+      </div>
+
+      <!-- Login Form -->
+      <div id="loginForm" class="{% if page == 'register' %}hidden{% endif %}">
+        <h2 class="form-title">Welcome Back</h2>
+        <p class="form-subtitle">Please enter your details</p>
+
+        {% if error and page != 'register' %}
+        <div class="alert alert-danger">
+          <i class="fas fa-exclamation-circle me-2"></i> {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="POST" action="/login">
+          <div class="form-group">
+            <label class="form-label">Username</label>
+            <div class="input-group-custom">
+              <input type="text" class="form-control" name="username" placeholder="Enter username" required>
+              <i class="fas fa-user"></i>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <div class="input-group-custom">
+              <input type="password" class="form-control" name="password" placeholder="••••••••" required>
+              <i class="fas fa-lock"></i>
+            </div>
+          </div>
+          <button type="submit" class="btn-auth">Sign In</button>
+        </form>
+
+        <p class="form-subtitle mt-4 mb-0">
+          New here? <a href="#" class="toggle-link" onclick="showRegister()">Create account</a>
+        </p>
+      </div>
+
+      <!-- Register Form -->
+      <div id="registerForm" class="{% if page != 'register' %}hidden{% endif %}">
+        <h2 class="form-title">Create Account</h2>
+        <p class="form-subtitle">Join the smart system today</p>
+
+        {% if error and page == 'register' %}
+        <div class="alert alert-danger">
+          <i class="fas fa-exclamation-circle me-2"></i> {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="POST" action="/register">
+          <div class="form-group">
+            <div class="input-group-custom">
+              <input type="text" class="form-control" name="username" placeholder="Username" required>
+              <i class="fas fa-user"></i>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="input-group-custom">
+              <input type="email" class="form-control" name="email" placeholder="Email Address" required>
+              <i class="fas fa-envelope"></i>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="input-group-custom">
+              <input type="password" class="form-control" name="password" placeholder="Password (min 6 chars)" required minlength="6">
+              <i class="fas fa-lock"></i>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="input-group-custom">
+              <input type="password" class="form-control" name="confirm_password" placeholder="Confirm Password" required>
+              <i class="fas fa-shield-alt"></i>
+            </div>
+          </div>
+          <div class="form-group">
+            <select class="form-select ps-3" name="role" required style="padding-left: 16px;">
+              <option value="user">Standard User</option>
+              <option value="admin">System Administrator</option>
+            </select>
+          </div>
+          <button type="submit" class="btn-auth">Register Now</button>
+        </form>
+
+        <p class="form-subtitle mt-4 mb-0">
+          Already have an account? <a href="#" class="toggle-link" onclick="showLogin()">Sign in</a>
+        </p>
+      </div>
+
+      <a href="/home" class="back-home">
+        <i class="fas fa-arrow-left me-1"></i> Back to Homepage
+      </a>
+    </div>
+
+    <script>
+      function showRegister() {
+        document.getElementById("loginForm").classList.add("hidden");
+        document.getElementById("registerForm").classList.remove("hidden");
+      }
+      function showLogin() {
+        document.getElementById("registerForm").classList.add("hidden");
+        document.getElementById("loginForm").classList.remove("hidden");
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,824 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SmartPark — Admin Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+</head>
+<style>
+  :root {
+    --bg:#f0f7ff; --surface:#ffffff; --surface2:#f8f9fa;
+    --border:#e9ecef;
+    --primary:#0d6efd; --primary-light:#e8f0fe; --primary-glow:rgba(13,110,253,0.12);
+    --success:#198754; --success-light:#d1e7dd; --success-glow:rgba(25,135,84,0.1);
+    --danger:#dc3545;  --danger-light:#f8d7da;  --danger-glow:rgba(220,53,69,0.1);
+    --warning:#fd7e14; --warning-light:#fff3cd; --warning-glow:rgba(253,126,20,0.1);
+    --text:#212529; --muted:#6c757d; --radius:16px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;}
+
+  /* Sidebar */
+  .sidebar{width:240px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);
+    display:flex;flex-direction:column;padding:24px 16px;position:fixed;top:0;left:0;z-index:100;
+    box-shadow:2px 0 8px rgba(0,0,0,0.04);}
+  .brand{display:flex;align-items:center;gap:10px;padding:0 8px 28px;border-bottom:1px solid var(--border);margin-bottom:20px;}
+  .brand-icon{width:38px;height:38px;background:var(--primary);
+    border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;color:#fff;}
+  .brand-name{font-size:1.1rem;font-weight:800;letter-spacing:-0.3px;color:var(--primary);}
+  .brand-name span{color:var(--text);}
+  .nav-section{font-size:0.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;
+    letter-spacing:1px;padding:0 8px;margin:16px 0 8px;}
+  .nav-item{list-style:none;}
+  .nav-link{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
+    color:var(--muted);text-decoration:none;font-size:0.875rem;font-weight:500;
+    transition:all 0.2s;cursor:pointer;border:none;background:none;width:100%;}
+  .nav-link:hover{background:var(--primary-light);color:var(--primary);}
+  .nav-link.active{background:var(--primary-light);color:var(--primary);font-weight:600;}
+  .nav-link i{width:18px;text-align:center;font-size:0.9rem;}
+  .admin-badge{font-size:0.6rem;background:var(--danger-light);color:var(--danger);
+    padding:2px 7px;border-radius:10px;margin-left:auto;font-weight:700;}
+  .sidebar-footer{margin-top:auto;padding-top:16px;border-top:1px solid var(--border);}
+  .user-card{display:flex;align-items:center;gap:10px;padding:10px 12px;
+    background:var(--surface2);border-radius:12px;border:1px solid var(--border);}
+  .avatar{width:34px;height:34px;background:var(--primary);
+    border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;color:#fff;flex-shrink:0;}
+  .user-meta{flex:1;min-width:0;}
+  .user-name{font-size:0.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text);}
+  .user-role{font-size:0.7rem;color:var(--primary);font-weight:600;}
+  .logout-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:6px;transition:color 0.2s;}
+  .logout-btn:hover{color:var(--danger);}
+
+  /* Main */
+  .main{margin-left:240px;flex:1;padding:28px 32px;min-height:100vh;}
+
+  /* Topbar */
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;}
+  .page-heading h1{font-size:1.5rem;font-weight:800;letter-spacing:-0.5px;color:var(--text);}
+  .page-heading p{font-size:0.85rem;color:var(--muted);margin-top:2px;}
+  .topbar-actions{display:flex;gap:10px;}
+  .btn-icon{display:flex;align-items:center;gap:7px;padding:9px 16px;border-radius:10px;
+    font-size:0.82rem;font-weight:600;border:1px solid var(--border);
+    background:var(--surface);color:var(--text);cursor:pointer;transition:all 0.2s;}
+  .btn-icon:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light);}
+  .btn-icon.primary{background:var(--primary);border-color:var(--primary);color:#fff;}
+  .btn-icon.primary:hover{background:#0a58ca;border-color:#0a58ca;}
+  .btn-icon.danger{background:var(--danger-light);border-color:var(--danger);color:var(--danger);}
+  .btn-icon.danger:hover{background:var(--danger);color:#fff;}
+  .btn-icon.success{background:var(--success-light);border-color:var(--success);color:var(--success);}
+  .btn-icon.success:hover{background:var(--success);color:#fff;}
+  .btn-icon.warning{background:var(--warning-light);border-color:var(--warning);color:var(--warning);}
+  .btn-icon.warning:hover{background:var(--warning);color:#fff;}
+
+  /* Stat Cards */
+  .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:22px 24px;position:relative;overflow:hidden;transition:transform 0.2s,box-shadow 0.2s;
+    box-shadow:0 2px 8px rgba(0,0,0,0.04);}
+  .stat-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,0.08);}
+  .stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius) var(--radius) 0 0;}
+  .stat-card.total::after{background:var(--primary);}
+  .stat-card.free::after {background:var(--success);}
+  .stat-card.occ::after  {background:var(--danger);}
+  .stat-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;}
+  .stat-badge{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1rem;}
+  .stat-card.total .stat-badge{background:var(--primary-light);color:var(--primary);}
+  .stat-card.free  .stat-badge{background:var(--success-light);color:var(--success);}
+  .stat-card.occ   .stat-badge{background:var(--danger-light); color:var(--danger);}
+  .stat-pct{font-size:0.75rem;font-weight:600;padding:3px 8px;border-radius:20px;}
+  .stat-card.total .stat-pct{background:var(--primary-light);color:var(--primary);}
+  .stat-card.free  .stat-pct{background:var(--success-light);color:var(--success);}
+  .stat-card.occ   .stat-pct{background:var(--danger-light); color:var(--danger);}
+  .stat-value{font-size:2.4rem;font-weight:800;letter-spacing:-1px;line-height:1;}
+  .stat-card.total .stat-value{color:var(--primary);}
+  .stat-card.free  .stat-value{color:var(--success);}
+  .stat-card.occ   .stat-value{color:var(--danger);}
+  .stat-label{font-size:0.8rem;color:var(--muted);margin-top:4px;}
+  .stat-bar{height:5px;background:var(--surface2);border-radius:3px;margin-top:16px;overflow:hidden;}
+  .stat-bar-fill{height:100%;border-radius:3px;transition:width 0.6s cubic-bezier(.4,0,.2,1);}
+  .stat-card.total .stat-bar-fill{background:var(--primary);}
+  .stat-card.free  .stat-bar-fill{background:var(--success);}
+  .stat-card.occ   .stat-bar-fill{background:var(--danger);}
+
+  /* Panel */
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.04);}
+  .panel-header{display:flex;justify-content:space-between;align-items:center;
+    padding:18px 22px;border-bottom:1px solid var(--border);background:var(--surface);}
+  .panel-title{font-size:0.95rem;font-weight:700;display:flex;align-items:center;gap:8px;color:var(--text);}
+  .panel-title i{color:var(--primary);}
+  .panel-body{padding:20px 22px;}
+
+  /* Upload Zone */
+  .upload-zone{border:2px dashed var(--border);border-radius:14px;padding:60px 40px;
+    text-align:center;cursor:pointer;transition:all 0.25s;background:var(--surface2);}
+  .upload-zone:hover,.upload-zone.drag{border-color:var(--primary);background:var(--primary-light);}
+  .upload-zone i{font-size:3rem;color:var(--primary);margin-bottom:16px;display:block;}
+  .upload-zone h3{font-size:1.1rem;font-weight:700;margin-bottom:8px;color:var(--text);}
+  .upload-zone p{font-size:0.85rem;color:var(--muted);}
+  .upload-hint{display:inline-block;margin-top:12px;padding:6px 16px;background:var(--primary-light);
+    color:var(--primary);border-radius:20px;font-size:0.78rem;font-weight:600;}
+
+  /* Video Canvas */
+  .canvas-wrap{position:relative;background:#000;border-radius:12px;overflow:hidden;}
+  #videoCanvas{width:100%;display:block;cursor:crosshair;}
+  .canvas-badge{position:absolute;top:12px;left:12px;background:rgba(255,255,255,0.92);
+    backdrop-filter:blur(6px);border:1px solid var(--border);
+    border-radius:20px;padding:4px 12px;font-size:0.72rem;font-weight:700;
+    display:flex;align-items:center;gap:6px;color:var(--text);}
+  .rec-dot{width:7px;height:7px;border-radius:50%;background:var(--danger);animation:pulse 1.5s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(1.3);}}
+  .canvas-hint{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);
+    background:rgba(255,255,255,0.9);backdrop-filter:blur(6px);border:1px solid var(--border);
+    border-radius:20px;padding:5px 14px;font-size:0.72rem;color:var(--muted);white-space:nowrap;}
+
+  /* Frame Slider */
+  .slider-row{padding:14px 0 4px;}
+  .slider-labels{display:flex;justify-content:space-between;font-size:0.78rem;color:var(--muted);margin-bottom:8px;}
+  input[type=range]{width:100%;height:6px;border-radius:3px;background:var(--surface2);
+    outline:none;-webkit-appearance:none;cursor:pointer;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;
+    border-radius:50%;background:var(--primary);cursor:pointer;box-shadow:0 2px 6px rgba(13,110,253,0.3);}
+
+  /* Control Buttons */
+  .controls-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;}
+  .ctrl-btn{display:flex;align-items:center;gap:7px;padding:10px 18px;border-radius:10px;
+    font-size:0.82rem;font-weight:600;border:none;cursor:pointer;transition:all 0.2s;}
+  .ctrl-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.15);}
+  .ctrl-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+  .ctrl-upload{background:var(--primary);color:#fff;}
+  .ctrl-upload:hover{background:#0a58ca;}
+  .ctrl-save  {background:var(--success);color:#fff;}
+  .ctrl-save:hover{background:#157347;}
+  .ctrl-undo  {background:#6f42c1;color:#fff;}
+  .ctrl-undo:hover{background:#5a32a3;}
+  .ctrl-clear {background:var(--danger);color:#fff;}
+  .ctrl-clear:hover{background:#b02a37;}
+  .ctrl-process{background:var(--warning);color:#fff;}
+  .ctrl-process:hover{background:#e8710a;}
+  .ctrl-play  {background:var(--primary);color:#fff;}
+  .ctrl-play:hover{background:#0a58ca;}
+
+  /* Slots Grid */
+  .slots-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:12px;}
+  .parking-slot{aspect-ratio:1;border-radius:12px;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:4px;border:2px solid transparent;
+    transition:all 0.2s;font-size:0.7rem;font-weight:600;}
+  .parking-slot.free    {background:var(--success-light);border-color:var(--success);color:var(--success);}
+  .parking-slot.occupied{background:var(--danger-light); border-color:var(--danger); color:var(--danger);}
+  .parking-slot:hover   {transform:scale(1.07);box-shadow:0 4px 16px rgba(0,0,0,0.12);}
+  .slot-number{font-size:1.2rem;font-weight:800;}
+  .slot-icon  {font-size:1rem;}
+  .slot-status{font-size:0.6rem;text-transform:uppercase;letter-spacing:0.5px;}
+  .empty-state{text-align:center;padding:40px;color:var(--muted);grid-column:1/-1;}
+  .empty-state i{font-size:2.5rem;color:var(--primary);opacity:0.2;margin-bottom:12px;display:block;}
+  .empty-state p{font-size:0.85rem;}
+
+  /* Settings */
+  .settings-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:20px 24px;}
+  .settings-card h5{font-size:0.9rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;color:var(--primary);}
+  .form-label-dark{font-size:0.75rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;}
+  .form-control-dark{width:100%;background:var(--surface);border:2px solid var(--border);
+    border-radius:10px;padding:10px 14px;color:var(--text);font-size:0.875rem;outline:none;
+    transition:border-color 0.2s;margin-bottom:14px;font-family:'Inter',sans-serif;}
+  .form-control-dark:focus{border-color:var(--primary);}
+  .form-control-dark:disabled{opacity:0.6;cursor:not-allowed;background:var(--surface2);}
+
+  /* Loading Overlay */
+  .loading-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,0.85);
+    backdrop-filter:blur(4px);z-index:2000;justify-content:center;align-items:center;flex-direction:column;gap:16px;}
+  .spinner{width:52px;height:52px;border:4px solid var(--border);border-top:4px solid var(--primary);
+    border-radius:50%;animation:spin 0.9s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .loading-text{font-size:0.9rem;color:var(--muted);font-weight:500;}
+  .loading-progress{width:200px;height:4px;background:var(--surface2);border-radius:2px;overflow:hidden;}
+  .loading-bar{height:100%;background:var(--primary);border-radius:2px;animation:loadbar 1.5s ease-in-out infinite;}
+  @keyframes loadbar{0%{width:0%;margin-left:0;}50%{width:60%;margin-left:20%;}100%{width:0%;margin-left:100%;}}
+
+  /* Toast */
+  #toast{position:fixed;bottom:28px;right:28px;background:var(--surface);border:1px solid var(--border);
+    border-radius:12px;padding:14px 20px;font-size:0.85rem;font-weight:500;color:var(--text);
+    box-shadow:0 8px 24px rgba(0,0,0,0.12);z-index:9999;display:flex;align-items:center;gap:10px;
+    transform:translateY(80px);opacity:0;transition:all 0.3s cubic-bezier(.4,0,.2,1);max-width:320px;}
+  #toast.show{transform:translateY(0);opacity:1;}
+
+  /* Responsive */
+  @media(max-width:900px){.stats-row{grid-template-columns:1fr 1fr;}}
+  @media(max-width:768px){
+    .sidebar{width:64px;padding:16px 8px;}
+    .brand-name,.nav-link span,.user-meta,.admin-badge{display:none;}
+    .nav-link{justify-content:center;}
+    .user-card{justify-content:center;}
+    .main{margin-left:64px;padding:20px 16px;}
+    .stats-row{grid-template-columns:1fr;}
+    .controls-row{justify-content:center;}
+  }
+</style>
+<body>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="brand">
+    <div class="brand-icon"><i class="fas fa-parking"></i></div>
+    <span class="brand-name">Smart<span>Park</span></span>
+  </div>
+  <ul style="list-style:none;padding:0;">
+    <li class="nav-section">Admin</li>
+    <li class="nav-item">
+      <button class="nav-link active" id="sidebarDashboard">
+        <i class="fas fa-th-large"></i><span>Dashboard</span>
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" id="sidebarUpload">
+        <i class="fas fa-cloud-upload-alt"></i><span>Upload Video</span>
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" id="sidebarRefresh">
+        <i class="fas fa-sync-alt"></i><span>Refresh</span>
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" id="sidebarRestart">
+        <i class="fas fa-redo"></i><span>Restart</span>
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" id="sidebarSettings">
+        <i class="fas fa-cog"></i><span>Settings</span>
+      </button>
+    </li>
+    <li class="nav-section">Danger</li>
+    <li class="nav-item">
+      <button class="nav-link" onclick="clearSystem()" style="color:var(--danger);">
+        <i class="fas fa-trash-alt"></i><span>Clear System</span>
+        <span class="admin-badge">ADMIN</span>
+      </button>
+    </li>
+  </ul>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="avatar">{{ username[0]|upper if username else 'A' }}</div>
+      <div class="user-meta">
+        <div class="user-name">{{ username }}</div>
+        <div class="user-role">Administrator</div>
+      </div>
+      <a href="/logout" class="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+    </div>
+  </div>
+</nav>
+
+<!-- Main -->
+<main class="main">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="page-heading">
+      <h1>Admin Dashboard</h1>
+      <p id="adminStatus">Upload a video to begin detection</p>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn-icon" id="newVideoBtn"><i class="fas fa-plus"></i> New Video</button>
+      <button class="btn-icon" id="refreshBtn"><i class="fas fa-sync-alt"></i> Refresh</button>
+      <button class="btn-icon" id="restartBtn"><i class="fas fa-redo"></i> Restart</button>
+      <button class="btn-icon danger" onclick="clearSystem()"><i class="fas fa-trash-alt"></i> Clear</button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row" id="statsSection" style="display:none;">
+    <div class="stat-card total">
+      <div class="stat-top">
+        <div class="stat-badge"><i class="fas fa-parking"></i></div>
+        <span class="stat-pct">100%</span>
+      </div>
+      <div class="stat-value" id="totalSpaces">0</div>
+      <div class="stat-label">Total Spaces</div>
+      <div class="stat-bar"><div class="stat-bar-fill" id="totalProgress" style="width:100%"></div></div>
+    </div>
+    <div class="stat-card free">
+      <div class="stat-top">
+        <div class="stat-badge"><i class="fas fa-check-circle"></i></div>
+        <span class="stat-pct" id="freePct">—</span>
+      </div>
+      <div class="stat-value" id="freeSpaces">0</div>
+      <div class="stat-label">Available</div>
+      <div class="stat-bar"><div class="stat-bar-fill" id="freeProgress" style="width:0%"></div></div>
+    </div>
+    <div class="stat-card occ">
+      <div class="stat-top">
+        <div class="stat-badge"><i class="fas fa-times-circle"></i></div>
+        <span class="stat-pct" id="occPct">—</span>
+      </div>
+      <div class="stat-value" id="occupiedSpaces">0</div>
+      <div class="stat-label">Occupied</div>
+      <div class="stat-bar"><div class="stat-bar-fill" id="occupiedProgress" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <!-- Upload Section -->
+  <div id="uploadSection">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title"><i class="fas fa-cloud-upload-alt"></i> Upload Parking Video</span>
+      </div>
+      <div class="panel-body">
+        <div class="upload-zone" id="uploadArea">
+          <input type="file" id="videoInput" accept="video/*" style="display:none"/>
+          <i class="fas fa-cloud-upload-alt"></i>
+          <h3>Drop your video here</h3>
+          <p>or click to browse files</p>
+          <span class="upload-hint">MP4 · AVI · MOV · MKV — max 500 MB</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Video + Slots Section -->
+  <div id="videoSection" style="display:none;">
+
+    <!-- Slots Overview -->
+    <div class="panel" id="overviewSection">
+      <div class="panel-header">
+        <span class="panel-title"><i class="fas fa-car"></i> Parking Slots Overview</span>
+        <span id="lastUpdated" style="font-size:0.75rem;color:var(--muted);">—</span>
+      </div>
+      <div class="panel-body">
+        <div class="slots-grid" id="slotsGrid">
+          <div class="empty-state">
+            <i class="fas fa-parking"></i>
+            <p>No slots defined yet — draw polygons on the video below</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Video Processing -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title"><i class="fas fa-video"></i> Video Processing</span>
+        <span id="currentFile" style="font-size:0.75rem;color:var(--muted);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+      </div>
+      <div class="panel-body">
+
+        <!-- Canvas -->
+        <div class="canvas-wrap">
+          <canvas id="videoCanvas" width="1280" height="720"></canvas>
+          <div class="canvas-badge"><div class="rec-dot"></div> ADMIN VIEW</div>
+          <div class="canvas-hint">Left-click to add points · Right-click to finish polygon</div>
+        </div>
+
+        <!-- Frame Slider -->
+        <div class="slider-row">
+          <div class="slider-labels">
+            <span><i class="fas fa-film" style="margin-right:6px;"></i>Frame Position</span>
+            <span id="frameNumber" style="color:var(--primary);font-weight:600;">0</span>
+          </div>
+          <input type="range" id="frameSlider" min="0" max="100" value="0"/>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls-row">
+          <button class="ctrl-btn ctrl-upload" id="uploadNewBtn"><i class="fas fa-cloud-upload-alt"></i> New Video</button>
+          <button class="ctrl-btn ctrl-save"   id="saveBtn">  <i class="fas fa-save"></i> Save Polygon</button>
+          <button class="ctrl-btn ctrl-undo"   id="undoBtn">  <i class="fas fa-undo"></i> Undo</button>
+          <button class="ctrl-btn ctrl-clear"  id="clearBtn"> <i class="fas fa-trash-alt"></i> Clear All</button>
+          <button class="ctrl-btn ctrl-process" id="processBtn"><i class="fas fa-bolt"></i> Process Frame</button>
+          <button class="ctrl-btn ctrl-play"   id="playBtn">  <i class="fas fa-play"></i> Auto Play</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Section -->
+  <div id="settingsSection" style="display:none;">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title"><i class="fas fa-cog"></i> System Settings</span>
+      </div>
+      <div class="panel-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="settings-card">
+              <h5><i class="fas fa-user-cog"></i> Account</h5>
+              <label class="form-label-dark">Username</label>
+              <input class="form-control-dark" value="{{ username }}" disabled/>
+              <label class="form-label-dark">Role</label>
+              <input class="form-control-dark" value="Administrator" disabled/>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="settings-card">
+              <h5><i class="fas fa-microchip"></i> AI Configuration</h5>
+              <label class="form-label-dark">YOLO Model</label>
+              <input class="form-control-dark" value="YOLOv8m (mAP 48%)" disabled/>
+              <label class="form-label-dark">Occupancy Threshold</label>
+              <input class="form-control-dark" value="30% intersection" disabled/>
+              <label class="form-label-dark">Device</label>
+              <input class="form-control-dark" value="CPU (set YOLO_DEVICE=0 for GPU)" disabled/>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="settings-card">
+              <h5><i class="fas fa-keyboard"></i> Polygon Controls</h5>
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;">
+                <div style="background:var(--surface);border-radius:8px;padding:10px 14px;font-size:0.82rem;">
+                  <span style="color:var(--primary);font-weight:700;">Left Click</span>
+                  <span style="color:var(--muted);margin-left:8px;">Add polygon point</span>
+                </div>
+                <div style="background:var(--surface);border-radius:8px;padding:10px 14px;font-size:0.82rem;">
+                  <span style="color:var(--primary);font-weight:700;">Right Click</span>
+                  <span style="color:var(--muted);margin-left:8px;">Finish polygon</span>
+                </div>
+                <div style="background:var(--surface);border-radius:8px;padding:10px 14px;font-size:0.82rem;">
+                  <span style="color:var(--success);font-weight:700;">Save Polygon</span>
+                  <span style="color:var(--muted);margin-left:8px;">Persist to server</span>
+                </div>
+                <div style="background:var(--surface);border-radius:8px;padding:10px 14px;font-size:0.82rem;">
+                  <span style="color:var(--warning);font-weight:700;">Process Frame</span>
+                  <span style="color:var(--muted);margin-left:8px;">Run YOLO detection</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="uploadLoading">
+  <div class="spinner"></div>
+  <div class="loading-text">Processing video...</div>
+  <div class="loading-progress"><div class="loading-bar"></div></div>
+</div>
+
+<!-- Toast -->
+<div id="toast"><i class="fas fa-info-circle" id="toastIcon"></i><span id="toastMsg"></span></div>
+
+<video id="sourceVideo" style="display:none;" preload="auto"></video>
+<form id="uploadForm" style="display:none;"><input type="file" id="videoFileInput" accept="video/*"/></form>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ── Toast helper (replaces alert) ──────────────────────────────────────────
+let toastTimer;
+function showToast(msg, type = 'info') {
+  const t = document.getElementById('toast'), icon = document.getElementById('toastIcon');
+  const colors = { success:'var(--success)', error:'var(--danger)', warning:'var(--warning)', info:'var(--primary)' };
+  const icons  = { success:'fa-check-circle', error:'fa-exclamation-circle', warning:'fa-exclamation-triangle', info:'fa-info-circle' };
+  icon.className = `fas ${icons[type] || icons.info}`;
+  icon.style.color = colors[type] || colors.info;
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ── State ──────────────────────────────────────────────────────────────────
+let currentFilename = '', polygons = [], currentPoints = [];
+let videoInfo = { totalFrames: 0, fps: 30 };
+let occupiedSlots = new Set(), currentSlotVehicles = {};
+let isPlaying = false, playInterval = null, lastFrameImage = null;
+let sliderTimeout;
+
+const vehicleIcons = { car:'fa-car', van:'fa-shuttle-van', truck:'fa-truck',
+  bus:'fa-bus', bicycle:'fa-bicycle', motor:'fa-motorcycle',
+  tricycle:'fa-motorcycle', 'awning-tricycle':'fa-motorcycle' };
+
+const canvas = document.getElementById('videoCanvas');
+const ctx    = canvas.getContext('2d');
+const video  = document.getElementById('sourceVideo');
+
+// ── Init ───────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  bindNav();
+  bindControls();
+  showUpload();
+});
+
+function bindNav() {
+  const map = {
+    sidebarDashboard: () => { showDashboard(); setActive('sidebarDashboard'); },
+    sidebarUpload:    () => { showUpload();    setActive('sidebarUpload'); },
+    sidebarRefresh:   () => { refreshData();   setActive('sidebarRefresh'); },
+    sidebarRestart:   () => { restartProcess();},
+    sidebarSettings:  () => { showSettings();  setActive('sidebarSettings'); },
+    newVideoBtn:      () => { showUpload();    setActive('sidebarUpload'); },
+    refreshBtn:       refreshData,
+    restartBtn:       restartProcess,
+    uploadNewBtn:     () => { showUpload();    setActive('sidebarUpload'); },
+    quickUpload:      () => { showUpload();    setActive('sidebarUpload'); },
+    quickDetect:      processFrame,
+    quickUndo:        undoLast,
+    quickClear:       clearAll,
+  };
+  Object.entries(map).forEach(([id, fn]) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('click', fn);
+  });
+}
+
+function bindControls() {
+  const uploadArea  = document.getElementById('uploadArea');
+  const videoInput  = document.getElementById('videoInput');
+  if (uploadArea && videoInput) {
+    uploadArea.addEventListener('click', () => videoInput.click());
+    videoInput.addEventListener('change', handleUpload);
+    uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('drag'); });
+    uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('drag'));
+    uploadArea.addEventListener('drop', e => {
+      e.preventDefault(); uploadArea.classList.remove('drag');
+      const f = e.dataTransfer.files[0];
+      if (f) { const dt = new DataTransfer(); dt.items.add(f); videoInput.files = dt.files; handleUpload({ target: videoInput }); }
+    });
+  }
+  canvas.addEventListener('click', handleCanvasClick);
+  canvas.addEventListener('contextmenu', finishPolygon);
+  const btns = { saveBtn: saveCurrentPolygon, undoBtn: undoLast, clearBtn: clearAll, processBtn: processFrame, playBtn: togglePlay };
+  Object.entries(btns).forEach(([id, fn]) => { const el = document.getElementById(id); if (el) el.addEventListener('click', fn); });
+  const slider = document.getElementById('frameSlider');
+  if (slider) slider.addEventListener('input', handleFrameChange);
+}
+
+function setActive(id) {
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  const el = document.getElementById(id); if (el) el.classList.add('active');
+}
+
+// ── Views ──────────────────────────────────────────────────────────────────
+function show(ids, hide) {
+  hide.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+  ids.forEach(([id, disp]) => { const el = document.getElementById(id); if (el) el.style.display = disp || 'block'; });
+}
+
+function showUpload() {
+  show([['uploadSection']], ['videoSection','settingsSection','statsSection']);
+  document.getElementById('statsSection').style.display = 'none';
+}
+
+function showDashboard() {
+  if (!currentFilename) { showUpload(); return; }
+  show([['videoSection'],['overviewSection'],['statsSection','grid']], ['uploadSection','settingsSection']);
+  drawCanvas();
+}
+
+function showSettings() {
+  show([['settingsSection']], ['uploadSection','videoSection','overviewSection','statsSection']);
+}
+
+// ── Upload ─────────────────────────────────────────────────────────────────
+async function handleUpload(e) {
+  const file = e.target.files[0]; if (!file) return;
+  document.getElementById('uploadLoading').style.display = 'flex';
+  const fd = new FormData(); fd.append('video', file);
+  try {
+    const res  = await fetch('/upload', { method: 'POST', body: fd });
+    const data = await res.json();
+    if (data.success) {
+      currentFilename = data.filename;
+      document.getElementById('currentFile').textContent = data.filename;
+      show([['videoSection'],['overviewSection'],['statsSection','grid']], ['uploadSection','settingsSection']);
+      await initializeVideo(data.url);
+      await loadSavedPolygons();
+      document.getElementById('frameSlider').value = 0;
+      await processFrame();
+      showToast('Video uploaded: ' + data.filename, 'success');
+    } else { showToast(data.error || 'Upload failed', 'error'); }
+  } catch(err) { showToast('Upload failed: ' + err.message, 'error'); }
+  document.getElementById('uploadLoading').style.display = 'none';
+}
+
+function initializeVideo(url) {
+  return new Promise(resolve => {
+    lastFrameImage = null;
+    video.src = url; video.load();
+    video.onloadedmetadata = async () => {
+      try {
+        const res  = await fetch(`/get-video-info?filename=${encodeURIComponent(currentFilename)}`);
+        const info = await res.json();
+        videoInfo.totalFrames = info.total_frames || 0;
+        videoInfo.fps = info.fps || 30;
+        const s = document.getElementById('frameSlider');
+        if (s) { s.max = (info.total_frames || 1) - 1; s.value = 0; }
+        video.currentTime = 0;
+      } catch(e) {}
+      resolve();
+    };
+    video.onseeked = () => drawCanvas();
+    video.onerror  = () => resolve();
+    setTimeout(resolve, 3000);
+  });
+}
+
+// ── Canvas ─────────────────────────────────────────────────────────────────
+function drawCanvas() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (lastFrameImage && lastFrameImage.complete) {
+    ctx.drawImage(lastFrameImage, 0, 0, canvas.width, canvas.height);
+  } else {
+    try { ctx.drawImage(video, 0, 0, canvas.width, canvas.height); } catch(e) {}
+  }
+  polygons.forEach((poly, i) => {
+    if (poly.length < 3) return;
+    ctx.strokeStyle = occupiedSlots.has(i) ? '#dc3545' : '#198754';
+    ctx.fillStyle   = occupiedSlots.has(i) ? 'rgba(220,53,69,0.2)' : 'rgba(25,135,84,0.15)';
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(poly[0][0], poly[0][1]);
+    poly.slice(1).forEach(p => ctx.lineTo(p[0], p[1]));
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    const cx = poly.reduce((s,p)=>s+p[0],0)/poly.length;
+    const cy = poly.reduce((s,p)=>s+p[1],0)/poly.length;
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 18px Inter,Arial';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(i+1, cx, cy);
+  });
+  ctx.fillStyle = '#ff5252';
+  currentPoints.forEach(p => { ctx.beginPath(); ctx.arc(p[0],p[1],5,0,Math.PI*2); ctx.fill(); });
+  if (currentPoints.length > 1) {
+    ctx.strokeStyle = '#ffab40'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(currentPoints[0][0], currentPoints[0][1]);
+    currentPoints.slice(1).forEach(p => ctx.lineTo(p[0],p[1])); ctx.stroke();
+  }
+  updateDashboard();
+}
+
+function handleCanvasClick(e) {
+  if (!currentFilename) return;
+  const r = canvas.getBoundingClientRect();
+  currentPoints.push([
+    Math.round((e.clientX - r.left) * canvas.width  / r.width),
+    Math.round((e.clientY - r.top)  * canvas.height / r.height)
+  ]);
+  drawCanvas();
+}
+
+function finishPolygon(e) {
+  e.preventDefault();
+  if (currentPoints.length >= 3) {
+    polygons.push([...currentPoints]); currentPoints = [];
+    drawCanvas(); showToast(`Space added! Total: ${polygons.length}`, 'success');
+  }
+}
+
+// ── Polygon CRUD ───────────────────────────────────────────────────────────
+async function saveCurrentPolygon() {
+  if (currentPoints.length < 3) { showToast('Need at least 3 points', 'warning'); return; }
+  try {
+    const res  = await fetch('/save-polygons', { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ filename: currentFilename, points: currentPoints }) });
+    const data = await res.json();
+    if (data.success) {
+      polygons.push([...currentPoints]); currentPoints = [];
+      drawCanvas(); showToast(`Saved! Total spaces: ${data.count}`, 'success');
+    }
+  } catch(e) { showToast('Failed to save', 'error'); }
+}
+
+async function loadSavedPolygons() {
+  try {
+    const res  = await fetch(`/get-polygons?filename=${encodeURIComponent(currentFilename)}`);
+    const data = await res.json();
+    if (data.polygons) { polygons = data.polygons; drawCanvas(); }
+  } catch(e) { polygons = []; }
+}
+
+function undoLast() {
+  if (currentPoints.length > 0) currentPoints.pop();
+  else if (polygons.length > 0) { polygons.pop(); occupiedSlots.clear(); }
+  drawCanvas();
+}
+
+async function clearAll() {
+  if (!confirm('Clear all parking spaces?')) return;
+  polygons = []; currentPoints = []; occupiedSlots.clear();
+  try { await fetch('/clear-polygons', { method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ filename: currentFilename }) }); } catch(e) {}
+  drawCanvas(); showToast('All spaces cleared', 'warning');
+}
+
+// ── Detection ──────────────────────────────────────────────────────────────
+async function processFrame() {
+  if (!currentFilename) { showToast('No video loaded', 'warning'); return; }
+  const frameNumber = parseInt(document.getElementById('frameSlider').value);
+  const btn = document.getElementById('processBtn');
+  btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+  try {
+    const res  = await fetch('/process-frame', { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ filename: currentFilename, frame_number: frameNumber }) });
+    const data = await res.json();
+    if (data.frame) {
+      occupiedSlots.clear(); currentSlotVehicles = data.slot_vehicles || {};
+      (data.occupied || []).forEach(i => occupiedSlots.add(i));
+      const img = new Image();
+      img.onload = () => { lastFrameImage = img; drawCanvas(); updateDashboard(); };
+      img.src = 'data:image/jpeg;base64,' + data.frame;
+      document.getElementById('lastUpdated').textContent = 'Updated: ' + new Date().toLocaleTimeString();
+      document.getElementById('adminStatus').textContent = `Processing: ${currentFilename} — Frame ${frameNumber}`;
+    }
+  } catch(e) { showToast('Processing failed', 'error'); }
+  btn.disabled = false; btn.innerHTML = '<i class="fas fa-bolt"></i> Process Frame';
+}
+
+function updateDashboard() {
+  const total = polygons.length, occ = occupiedSlots.size, free = Math.max(0, total - occ);
+  const setText = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  const setW    = (id, w) => { const el = document.getElementById(id); if (el) el.style.width = w; };
+  setText('totalSpaces', total); setText('freeSpaces', free); setText('occupiedSpaces', occ);
+  setText('freePct',  total > 0 ? Math.round(free/total*100)+'%' : '—');
+  setText('occPct',   total > 0 ? Math.round(occ/total*100)+'%'  : '—');
+  setW('freeProgress',     total > 0 ? (free/total*100)+'%' : '0%');
+  setW('occupiedProgress', total > 0 ? (occ/total*100)+'%'  : '0%');
+  if (total > 0) document.getElementById('statsSection').style.display = 'grid';
+
+  const grid = document.getElementById('slotsGrid'); if (!grid) return;
+  if (total === 0) {
+    grid.innerHTML = '<div class="empty-state"><i class="fas fa-parking"></i><p>No slots defined — draw polygons on the video</p></div>';
+    return;
+  }
+  grid.innerHTML = '';
+  for (let i = 0; i < total; i++) {
+    const isOcc = occupiedSlots.has(i);
+    const vType = currentSlotVehicles[i.toString()];
+    const icon  = isOcc ? (vehicleIcons[vType] || 'fa-car') : 'fa-car';
+    const el = document.createElement('div');
+    el.className = `parking-slot ${isOcc ? 'occupied' : 'free'}`;
+    el.innerHTML = `<span class="slot-number">${i+1}</span>
+      <i class="fas ${icon} slot-icon"></i>
+      <span class="slot-status">${isOcc ? 'Occupied' : 'Free'}</span>`;
+    grid.appendChild(el);
+  }
+}
+
+// ── Slider & Playback ──────────────────────────────────────────────────────
+function handleFrameChange(e) {
+  const n = parseInt(e.target.value);
+  document.getElementById('frameNumber').textContent = n;
+  lastFrameImage = null; video.currentTime = n / videoInfo.fps;
+  if (sliderTimeout) clearTimeout(sliderTimeout);
+  sliderTimeout = setTimeout(processFrame, 300);
+}
+
+function togglePlay() { isPlaying ? stopPlay() : startPlay(); }
+
+function startPlay() {
+  if (!currentFilename) return;
+  isPlaying = true;
+  const btn = document.getElementById('playBtn');
+  if (btn) { btn.innerHTML = '<i class="fas fa-pause"></i> Pause'; btn.classList.remove('ctrl-play'); btn.classList.add('ctrl-clear'); }
+  playInterval = setInterval(async () => {
+    const s = document.getElementById('frameSlider'); if (!s) return;
+    let next = parseInt(s.value) + 10;
+    if (next >= videoInfo.totalFrames) next = 0;
+    s.value = next;
+    document.getElementById('frameNumber').textContent = next;
+    video.currentTime = next / videoInfo.fps;
+    await processFrame();
+    if (!isPlaying) stopPlay();
+  }, 1000);
+}
+
+function stopPlay() {
+  isPlaying = false;
+  if (playInterval) { clearInterval(playInterval); playInterval = null; }
+  const btn = document.getElementById('playBtn');
+  if (btn) { btn.innerHTML = '<i class="fas fa-play"></i> Auto Play'; btn.classList.remove('ctrl-clear'); btn.classList.add('ctrl-play'); }
+}
+
+// ── Misc ───────────────────────────────────────────────────────────────────
+async function refreshData() {
+  if (!currentFilename) { showUpload(); return; }
+  showDashboard(); await loadSavedPolygons(); await processFrame();
+  showToast('Refreshed', 'success');
+}
+
+function restartProcess() {
+  if (!confirm('Restart? Current view will be cleared.')) return;
+  currentFilename = ''; polygons = []; currentPoints = [];
+  occupiedSlots.clear(); currentSlotVehicles = {}; video.src = '';
+  lastFrameImage = null; stopPlay();
+  ['totalSpaces','freeSpaces','occupiedSpaces'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '0'; });
+  ['totalProgress','freeProgress','occupiedProgress'].forEach(id => { const el = document.getElementById(id); if (el) el.style.width = '0%'; });
+  document.getElementById('statsSection').style.display = 'none';
+  showUpload(); setActive('sidebarUpload');
+  showToast('Process restarted', 'info');
+}
+
+async function clearSystem() {
+  if (!confirm('Clear the monitoring session? Users will see an empty dashboard until a new video is processed.')) return;
+  try {
+    const res  = await fetch('/api/clear-system', { method: 'POST' });
+    const data = await res.json();
+    if (data.success) { showToast('System cleared — user dashboard is now empty', 'warning'); }
+  } catch(e) { showToast('Failed to clear system', 'error'); }
+}
+</script>
+</body>
+</html>

@@ -1,15 +1,14 @@
 # GitHub Upload TODO
 
-## Steps from Approved Plan:
+## Completed & Next Steps:
 
-- [ ] 1. Install Git for Windows
-- [ ] 2. Install GitHub CLI (gh)
-- [x] 3. Create .gitignore (exclude venv, pycache, db, large models/videos)
-- [x] 4. Create README.md from PROJECT_DOCUMENTATION.md
-- [ ] 5. git init
-- [ ] 6. git add .
-- [ ] 7. git commit -m "Initial commit"
-- [ ] 8. gh repo create Parking-Free-Space-Detection --public --source=. --remote=origin --push
-- [ ] 9. Setup git lfs track "_.pt" "_.mp4" (optional, excluded if large)
-- [ ] 10. Verify on GitHub
-- [ ] 11. Test project locally post-setup
+- [x] 1. Clean up redundant nested folders & temporary test files
+- [x] 2. Configure .gitignore (excluded .venv, pycache, db, .pt weights, .mp4 videos)
+- [x] 3. Maintain essential polygon coordinates (`object/poligon.obj`)
+- [x] 4. Setup README.md & PROJECT_DOCUMENTATION.md
+- [x] 5. `git init`
+- [x] 6. `git add .`
+- [x] 7. `git commit -m "Initial commit..."`
+- [ ] 8. Add GitHub remote (`git remote add origin <YOUR_GITHUB_REPO_URL>`)
+- [ ] 9. Push to GitHub (`git push -u origin main`)
+
